@@ -1,1 +1,1215 @@
-<HTML><p>Hello World</p></HTML>
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pencarian Min & Median - Iteratif vs Rekursif</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      }
+
+      h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 28px;
+      }
+
+      .input-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+      }
+
+      .input-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: #555;
+      }
+
+      input[type="number"],
+      select {
+        flex: 1;
+        min-width: 150px;
+        padding: 10px;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+      }
+
+      input[type="number"]:focus,
+      select:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      button {
+        padding: 10px 25px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      button:hover:not(:disabled) {
+        background: #5568d3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      button:active:not(:disabled) {
+        transform: translateY(0);
+      }
+
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+
+      .method-selector {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 25px;
+      }
+
+      .method-btn {
+        padding: 12px 30px;
+        border: 3px solid #667eea;
+        background: white;
+        color: #667eea;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .method-btn.active {
+        background: #667eea;
+        color: white;
+      }
+
+      .method-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+
+      .visualization-container {
+        display: none;
+      }
+
+      .visualization-container.active {
+        display: block;
+      }
+
+      .array-display {
+        background: #fff;
+        padding: 15px;
+        border-radius: 6px;
+        border: 2px solid #e9ecef;
+        margin-bottom: 20px;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .array-label {
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 8px;
+        font-size: 16px;
+      }
+
+      .array-values {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .array-item {
+        background: #667eea;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        min-width: 45px;
+        text-align: center;
+      }
+
+      .array-item.comparing {
+        background: #ffc107;
+        transform: scale(1.15);
+        box-shadow: 0 4px 8px rgba(255, 193, 7, 0.5);
+      }
+
+      .array-item.swapping {
+        background: #ff5722;
+        transform: scale(1.2);
+        box-shadow: 0 6px 12px rgba(255, 87, 34, 0.6);
+        animation: pulse 0.5s ease-in-out;
+      }
+
+      .array-item.sorted {
+        background: #4caf50;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1.2);
+        }
+        50% {
+          transform: scale(1.3);
+        }
+      }
+
+      .sorting-info {
+        background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+        padding: 20px;
+        border-radius: 8px;
+        border: 2px solid #667eea;
+        margin-bottom: 20px;
+      }
+
+      .info-header {
+        text-align: center;
+        font-size: 20px;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+      }
+
+      .info-item {
+        text-align: center;
+        background: white;
+        padding: 15px;
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .info-label {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .info-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #667eea;
+      }
+
+      .results {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 8px;
+        margin-top: 20px;
+      }
+
+      .results-title {
+        font-size: 20px;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      .results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+
+      .result-item {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 15px;
+        border-radius: 6px;
+        text-align: center;
+      }
+
+      .result-label {
+        font-size: 12px;
+        opacity: 0.9;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+      }
+
+      .result-value {
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .comparison-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 20px;
+        border: 2px solid #667eea;
+      }
+
+      .comparison-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #667eea;
+        text-align: center;
+        margin-bottom: 15px;
+      }
+
+      .comparison-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+      }
+
+      .comparison-card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .comparison-method {
+        font-size: 16px;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 10px;
+        text-align: center;
+      }
+
+      .comparison-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .stat-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px;
+        background: #f8f9fa;
+        border-radius: 4px;
+      }
+
+      .stat-label {
+        font-weight: 600;
+        color: #555;
+      }
+
+      .stat-value {
+        font-weight: 700;
+        color: #667eea;
+      }
+
+      .info-note {
+        background: #fff3cd;
+        border: 2px solid #ffc107;
+        padding: 12px;
+        border-radius: 6px;
+        margin-top: 10px;
+        font-size: 13px;
+        color: #856404;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 20px;
+        }
+
+        h1 {
+          font-size: 22px;
+        }
+
+        .method-selector {
+          flex-direction: column;
+        }
+
+        .method-btn {
+          width: 100%;
+        }
+
+        .input-group {
+          flex-direction: column;
+        }
+
+        input[type="number"],
+        select,
+        button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔍 Pencarian Nilai Minimum & Median</h1>
+
+      <div class="input-section">
+        <label for="arraySize">Jumlah Elemen Array:</label>
+        <div class="input-group">
+          <input
+            type="number"
+            id="arraySize"
+            min="1"
+            value="10"
+            placeholder="Masukkan jumlah elemen"
+          />
+          <button onclick="generateArray()">Generate Array</button>
+        </div>
+
+        <label for="sortMethod" style="margin-top: 15px">Metode Sorting:</label>
+        <div class="input-group">
+          <select id="sortMethod">
+            <option value="selection">Selection Sort</option>
+            <option value="insertion">Insertion Sort</option>
+          </select>
+        </div>
+
+        <label for="sortSpeed" style="margin-top: 15px"
+          >Kecepatan Animasi:</label
+        >
+        <div class="input-group">
+          <select id="sortSpeed">
+            <option value="1">Sangat Lambat (1000ms)</option>
+            <option value="2">Lambat (500ms)</option>
+            <option value="3" selected>Normal (200ms)</option>
+            <option value="4">Cepat (100ms)</option>
+            <option value="5">Sangat Cepat (50ms)</option>
+            <option value="6">Instan (Tanpa Delay)</option>
+          </select>
+        </div>
+
+        <div class="info-note">
+          💡 <strong>Tips:</strong> Untuk array > 1000 elemen, gunakan mode
+          "Instan" untuk hasil cepat. Visualisasi akan dinonaktifkan otomatis
+          untuk array > 500 elemen.
+        </div>
+      </div>
+
+      <div id="originalArray" class="array-display hidden">
+        <div class="array-label">
+          Array Original (<span id="arrayCount">0</span> elemen):
+        </div>
+        <div id="originalValues" class="array-values"></div>
+      </div>
+
+      <div class="method-selector hidden" id="methodSelector">
+        <button class="method-btn active" onclick="showMethod('iterative')">
+          ITERATIF
+        </button>
+        <button class="method-btn" onclick="showMethod('recursive')">
+          REKURSIF
+        </button>
+        <button class="method-btn" onclick="showComparison()">
+          PERBANDINGAN
+        </button>
+      </div>
+
+      <!-- Visualisasi Iteratif -->
+      <div id="iterativeViz" class="visualization-container active">
+        <div class="sorting-info hidden" id="iterInfo">
+          <div class="info-header">
+            📊 ITERATIF - <span id="iterMethodName">-</span>
+          </div>
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Status</div>
+              <div class="info-value" id="iterStatus">-</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Swap</div>
+              <div class="info-value" id="iterSwapCount">0</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Perbandingan</div>
+              <div class="info-value" id="iterCompareCount">0</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Waktu Sorting</div>
+              <div class="info-value" id="iterSortTime">0ms</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="array-display hidden" id="iterArrayDisplay">
+          <div class="array-label">Array Iteratif (Sedang Diproses):</div>
+          <div id="iterArrayValues" class="array-values"></div>
+        </div>
+
+        <div class="results hidden" id="iterResults">
+          <div class="results-title">🎯 HASIL ITERATIF</div>
+          <div class="results-grid">
+            <div class="result-item">
+              <div class="result-label">Nilai Minimum</div>
+              <div class="result-value" id="iterMinValue">-</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Median</div>
+              <div class="result-value" id="iterMedianValue">-</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Waktu Eksekusi</div>
+              <div class="result-value" id="iterExecTime">-</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px">
+          <button
+            onclick="startIterativeSorting()"
+            id="iterBtn"
+            disabled
+            style="font-size: 18px; padding: 15px 40px"
+          >
+            🚀 Mulai Iteratif
+          </button>
+        </div>
+      </div>
+
+      <!-- Visualisasi Rekursif -->
+      <div id="recursiveViz" class="visualization-container">
+        <div class="sorting-info hidden" id="recurInfo">
+          <div class="info-header">
+            🔄 REKURSIF - <span id="recurMethodName">-</span>
+          </div>
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Status</div>
+              <div class="info-value" id="recurStatus">-</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Swap</div>
+              <div class="info-value" id="recurSwapCount">0</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Perbandingan</div>
+              <div class="info-value" id="recurCompareCount">0</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Waktu Sorting</div>
+              <div class="info-value" id="recurSortTime">0ms</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="array-display hidden" id="recurArrayDisplay">
+          <div class="array-label">Array Rekursif (Sedang Diproses):</div>
+          <div id="recurArrayValues" class="array-values"></div>
+        </div>
+
+        <div class="results hidden" id="recurResults">
+          <div class="results-title">🎯 HASIL REKURSIF</div>
+          <div class="results-grid">
+            <div class="result-item">
+              <div class="result-label">Nilai Minimum</div>
+              <div class="result-value" id="recurMinValue">-</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Median</div>
+              <div class="result-value" id="recurMedianValue">-</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Waktu Eksekusi</div>
+              <div class="result-value" id="recurExecTime">-</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px">
+          <button
+            onclick="startRecursiveSorting()"
+            id="recurBtn"
+            disabled
+            style="font-size: 18px; padding: 15px 40px"
+          >
+            🚀 Mulai Rekursif
+          </button>
+        </div>
+      </div>
+
+      <!-- Comparison Section -->
+      <div id="comparisonViz" class="visualization-container">
+        <div class="comparison-section hidden" id="comparisonSection">
+          <div class="comparison-title">📊 PERBANDINGAN HASIL</div>
+          <div class="comparison-grid">
+            <div class="comparison-card">
+              <div class="comparison-method">🔵 ITERATIF</div>
+              <div class="comparison-stats">
+                <div class="stat-row">
+                  <span class="stat-label">Swap:</span>
+                  <span class="stat-value" id="compIterSwap">-</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Perbandingan:</span>
+                  <span class="stat-value" id="compIterCompare">-</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Waktu Sorting:</span>
+                  <span class="stat-value" id="compIterSort">-</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Minimum:</span>
+                  <span class="stat-value" id="compIterMin">-</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Median:</span>
+                  <span class="stat-value" id="compIterMedian">-</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="comparison-card">
+              <div class="comparison-method">🔴 REKURSIF</div>
+              <div class="comparison-stats">
+                <div class="stat-row">
+                  <span class="stat-label">Swap:</span>
+                  <span class="stat-value" id="compRecurSwap">-</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Perbandingan:</span>
+                  <span class="stat-value" id="compRecurCompare">-</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Waktu Sorting:</span>
+                  <span class="stat-value" id="compRecurSort">-</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Minimum:</span>
+                  <span class="stat-value" id="compRecurMin">-</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Median:</span>
+                  <span class="stat-value" id="compRecurMedian">-</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            style="
+              text-align: center;
+              margin-top: 20px;
+              padding: 15px;
+              background: white;
+              border-radius: 6px;
+            "
+          >
+            <p style="font-size: 14px; color: #666; margin-bottom: 10px">
+              💡 Jalankan kedua metode untuk melihat perbandingan lengkap
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let originalArray = [];
+      let iterArray = [];
+      let recurArray = [];
+
+      let iterSwap = 0,
+        iterCompare = 0,
+        iterSortStart = 0;
+      let recurSwap = 0,
+        recurCompare = 0,
+        recurSortStart = 0;
+
+      let iterSortTime = 0,
+        recurSortTime = 0;
+      let iterMin = null,
+        iterMedian = null,
+        iterExec = null;
+      let recurMin = null,
+        recurMedian = null,
+        recurExec = null;
+
+      let isSorting = false;
+      let currentMethod = "iterative";
+      let enableVisualization = true;
+
+      function getDelay() {
+        const speed = document.getElementById("sortSpeed").value;
+        if (speed === "6") return 0;
+        const delays = { 1: 1000, 2: 500, 3: 200, 4: 100, 5: 50 };
+        return delays[speed];
+      }
+
+      function generateArray() {
+        const size = parseInt(document.getElementById("arraySize").value);
+
+        if (isNaN(size) || size < 1) {
+          alert("Masukkan jumlah elemen yang valid (minimal 1)");
+          return;
+        }
+
+        originalArray = [];
+        for (let i = 0; i < size; i++) {
+          originalArray.push(Math.floor(Math.random() * 1000) + 1);
+        }
+
+        enableVisualization = size <= 500;
+
+        iterArray = [...originalArray];
+        recurArray = [...originalArray];
+
+        iterSwap = iterCompare = recurSwap = recurCompare = 0;
+        iterMin =
+          iterMedian =
+          iterExec =
+          recurMin =
+          recurMedian =
+          recurExec =
+            null;
+
+        displayOriginalArray();
+
+        document.getElementById("methodSelector").classList.remove("hidden");
+        document.getElementById("iterBtn").disabled = false;
+        document.getElementById("recurBtn").disabled = false;
+
+        document.getElementById("iterInfo").classList.add("hidden");
+        document.getElementById("iterArrayDisplay").classList.add("hidden");
+        document.getElementById("iterResults").classList.add("hidden");
+        document.getElementById("recurInfo").classList.add("hidden");
+        document.getElementById("recurArrayDisplay").classList.add("hidden");
+        document.getElementById("recurResults").classList.add("hidden");
+        document.getElementById("comparisonSection").classList.add("hidden");
+      }
+
+      function displayOriginalArray() {
+        const container = document.getElementById("originalValues");
+        const count = document.getElementById("arrayCount");
+        count.textContent = originalArray.length;
+
+        container.innerHTML = "";
+
+        const displayLimit = 500;
+        const displayArray =
+          originalArray.length > displayLimit
+            ? originalArray.slice(0, displayLimit)
+            : originalArray;
+
+        displayArray.forEach((value) => {
+          const item = document.createElement("div");
+          item.className = "array-item";
+          item.textContent = value;
+          container.appendChild(item);
+        });
+
+        if (originalArray.length > displayLimit) {
+          const more = document.createElement("div");
+          more.className = "array-item";
+          more.style.background = "#999";
+          more.textContent = `... +${originalArray.length - displayLimit}`;
+          container.appendChild(more);
+        }
+
+        document.getElementById("originalArray").classList.remove("hidden");
+      }
+
+      function showMethod(method) {
+        currentMethod = method;
+
+        document.querySelectorAll(".method-btn").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+        event.target.classList.add("active");
+
+        document.getElementById("iterativeViz").classList.remove("active");
+        document.getElementById("recursiveViz").classList.remove("active");
+        document.getElementById("comparisonViz").classList.remove("active");
+
+        if (method === "iterative") {
+          document.getElementById("iterativeViz").classList.add("active");
+        } else if (method === "recursive") {
+          document.getElementById("recursiveViz").classList.add("active");
+        }
+      }
+
+      function showComparison() {
+        currentMethod = "comparison";
+
+        document.querySelectorAll(".method-btn").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+        event.target.classList.add("active");
+
+        document.getElementById("iterativeViz").classList.remove("active");
+        document.getElementById("recursiveViz").classList.remove("active");
+        document.getElementById("comparisonViz").classList.add("active");
+
+        updateComparison();
+      }
+
+      function updateComparison() {
+        if (iterMin !== null) {
+          document.getElementById("compIterSwap").textContent = iterSwap;
+          document.getElementById("compIterCompare").textContent = iterCompare;
+          document.getElementById("compIterSort").textContent =
+            iterSortTime + "ms";
+          document.getElementById("compIterMin").textContent = iterMin;
+          document.getElementById("compIterMedian").textContent = iterMedian;
+        }
+
+        if (recurMin !== null) {
+          document.getElementById("compRecurSwap").textContent = recurSwap;
+          document.getElementById("compRecurCompare").textContent =
+            recurCompare;
+          document.getElementById("compRecurSort").textContent =
+            recurSortTime + "ms";
+          document.getElementById("compRecurMin").textContent = recurMin;
+          document.getElementById("compRecurMedian").textContent = recurMedian;
+        }
+
+        if (iterMin !== null || recurMin !== null) {
+          document
+            .getElementById("comparisonSection")
+            .classList.remove("hidden");
+        }
+      }
+
+      function displayIterArray(highlightIndices = [], className = "") {
+        if (!enableVisualization) return;
+
+        const container = document.getElementById("iterArrayValues");
+        container.innerHTML = "";
+
+        const displayLimit = 500;
+        const displayArray =
+          iterArray.length > displayLimit
+            ? iterArray.slice(0, displayLimit)
+            : iterArray;
+
+        displayArray.forEach((value, index) => {
+          const item = document.createElement("div");
+          item.className = "array-item";
+          if (highlightIndices.includes(index)) {
+            item.classList.add(className);
+          }
+          item.textContent = value;
+          container.appendChild(item);
+        });
+
+        document.getElementById("iterArrayDisplay").classList.remove("hidden");
+      }
+
+      function displayRecurArray(highlightIndices = [], className = "") {
+        if (!enableVisualization) return;
+
+        const container = document.getElementById("recurArrayValues");
+        container.innerHTML = "";
+
+        const displayLimit = 500;
+        const displayArray =
+          recurArray.length > displayLimit
+            ? recurArray.slice(0, displayLimit)
+            : recurArray;
+
+        displayArray.forEach((value, index) => {
+          const item = document.createElement("div");
+          item.className = "array-item";
+          if (highlightIndices.includes(index)) {
+            item.classList.add(className);
+          }
+          item.textContent = value;
+          container.appendChild(item);
+        });
+
+        document.getElementById("recurArrayDisplay").classList.remove("hidden");
+      }
+
+      function sleep(ms) {
+        if (ms === 0) return Promise.resolve();
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      async function startIterativeSorting() {
+        if (isSorting) return;
+        isSorting = true;
+
+        iterArray = [...originalArray];
+        iterSwap = iterCompare = 0;
+        iterSortStart = Date.now();
+
+        document.getElementById("iterBtn").disabled = true;
+        document.getElementById("iterInfo").classList.remove("hidden");
+
+        const method = document.getElementById("sortMethod").value;
+        document.getElementById("iterMethodName").textContent =
+          method.toUpperCase();
+        document.getElementById("iterStatus").textContent = "Berjalan...";
+
+        updateIterInfo();
+        if (enableVisualization) displayIterArray();
+
+        try {
+          if (method === "selection") {
+            await selectionSortIter();
+          } else {
+            await insertionSortIter();
+          }
+
+          iterSortTime = Date.now() - iterSortStart;
+          document.getElementById("iterStatus").textContent = "Selesai ✓";
+          updateIterInfo();
+
+          await calculateIterResults();
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Terjadi error saat sorting iteratif");
+        }
+
+        isSorting = false;
+        document.getElementById("iterBtn").disabled = false;
+      }
+
+      function updateIterInfo() {
+        document.getElementById("iterSwapCount").textContent = iterSwap;
+        document.getElementById("iterCompareCount").textContent = iterCompare;
+        document.getElementById("iterSortTime").textContent =
+          Date.now() - iterSortStart + "ms";
+      }
+
+      async function selectionSortIter() {
+        const n = iterArray.length;
+        const delay = getDelay();
+        const updateInterval = 10000;
+
+        for (let i = 0; i < n - 1; i++) {
+          let minIdx = i;
+
+          for (let j = i + 1; j < n; j++) {
+            iterCompare++;
+
+            if (delay > 0) {
+              updateIterInfo();
+              displayIterArray([minIdx, j], "comparing");
+              await sleep(delay);
+            } else if (iterCompare % updateInterval === 0) {
+              updateIterInfo();
+              await sleep(1);
+            }
+
+            if (iterArray[j] < iterArray[minIdx]) {
+              minIdx = j;
+            }
+          }
+
+          if (minIdx !== i) {
+            [iterArray[i], iterArray[minIdx]] = [
+              iterArray[minIdx],
+              iterArray[i],
+            ];
+            iterSwap++;
+
+            if (delay > 0) {
+              updateIterInfo();
+              displayIterArray([i, minIdx], "swapping");
+              await sleep(delay);
+            } else if (iterSwap % (updateInterval / 10) === 0) {
+              updateIterInfo();
+              await sleep(1);
+            }
+          }
+        }
+
+        updateIterInfo();
+        if (enableVisualization) {
+          displayIterArray(
+            Array.from({ length: Math.min(n, 500) }, (_, i) => i),
+            "sorted"
+          );
+        }
+      }
+
+      async function insertionSortIter() {
+        const n = iterArray.length;
+        const delay = getDelay();
+        const updateInterval = 10000;
+
+        for (let i = 1; i < n; i++) {
+          let key = iterArray[i];
+          let j = i - 1;
+
+          if (delay > 0) {
+            displayIterArray([i], "comparing");
+            await sleep(delay);
+          }
+
+          while (j >= 0 && iterArray[j] > key) {
+            iterCompare++;
+            iterArray[j + 1] = iterArray[j];
+            iterSwap++;
+
+            if (delay > 0) {
+              updateIterInfo();
+              displayIterArray([j, j + 1], "swapping");
+              await sleep(delay);
+            } else if (iterSwap % updateInterval === 0) {
+              updateIterInfo();
+              await sleep(1);
+            }
+            j--;
+          }
+          iterArray[j + 1] = key;
+        }
+
+        updateIterInfo();
+        if (enableVisualization) {
+          displayIterArray(
+            Array.from({ length: Math.min(n, 500) }, (_, i) => i),
+            "sorted"
+          );
+        }
+      }
+
+      async function calculateIterResults() {
+        const start = performance.now();
+        iterMin = Math.min(...iterArray);
+        const mid = Math.floor(iterArray.length / 2);
+        iterMedian =
+          iterArray.length % 2 === 0
+            ? ((iterArray[mid - 1] + iterArray[mid]) / 2).toFixed(2)
+            : iterArray[mid];
+        const end = performance.now();
+        iterExec = (end - start).toFixed(4);
+
+        document.getElementById("iterMinValue").textContent = iterMin;
+        document.getElementById("iterMedianValue").textContent = iterMedian;
+        document.getElementById("iterExecTime").textContent = iterExec + " ms";
+
+        document.getElementById("iterResults").classList.remove("hidden");
+      }
+
+      async function startRecursiveSorting() {
+        if (isSorting) return;
+        isSorting = true;
+
+        recurArray = [...originalArray];
+        recurSwap = recurCompare = 0;
+        recurSortStart = Date.now();
+
+        document.getElementById("recurBtn").disabled = true;
+        document.getElementById("recurInfo").classList.remove("hidden");
+
+        const method = document.getElementById("sortMethod").value;
+        document.getElementById("recurMethodName").textContent =
+          method.toUpperCase();
+        document.getElementById("recurStatus").textContent = "Berjalan...";
+
+        updateRecurInfo();
+        if (enableVisualization) displayRecurArray();
+
+        try {
+          if (method === "selection") {
+            await selectionSortRecur(0);
+          } else {
+            await insertionSortRecur(1);
+          }
+
+          recurSortTime = Date.now() - recurSortStart;
+          document.getElementById("recurStatus").textContent = "Selesai ✓";
+          updateRecurInfo();
+
+          await calculateRecurResults();
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Terjadi error saat sorting rekursif");
+        }
+
+        isSorting = false;
+        document.getElementById("recurBtn").disabled = false;
+      }
+
+      function updateRecurInfo() {
+        document.getElementById("recurSwapCount").textContent = recurSwap;
+        document.getElementById("recurCompareCount").textContent = recurCompare;
+        document.getElementById("recurSortTime").textContent =
+          Date.now() - recurSortStart + "ms";
+      }
+
+      async function selectionSortRecur(i) {
+        const n = recurArray.length;
+        const delay = getDelay();
+        const updateInterval = 10000;
+
+        if (i >= n - 1) {
+          if (enableVisualization) {
+            displayRecurArray(
+              Array.from({ length: Math.min(n, 500) }, (_, idx) => idx),
+              "sorted"
+            );
+          }
+          return;
+        }
+
+        let minIdx = await findMinIndexRecur(i, i + 1, i);
+
+        if (minIdx !== i) {
+          [recurArray[i], recurArray[minIdx]] = [
+            recurArray[minIdx],
+            recurArray[i],
+          ];
+          recurSwap++;
+
+          if (delay > 0) {
+            updateRecurInfo();
+            displayRecurArray([i, minIdx], "swapping");
+            await sleep(delay);
+          } else if (recurSwap % (updateInterval / 10) === 0) {
+            updateRecurInfo();
+            await sleep(1);
+          }
+        }
+
+        return await selectionSortRecur(i + 1);
+      }
+
+      async function findMinIndexRecur(start, j, minIdx) {
+        const n = recurArray.length;
+        const delay = getDelay();
+        const updateInterval = 10000;
+
+        if (j >= n) return minIdx;
+
+        recurCompare++;
+
+        if (delay > 0) {
+          updateRecurInfo();
+          displayRecurArray([minIdx, j], "comparing");
+          await sleep(delay);
+        } else if (recurCompare % updateInterval === 0) {
+          updateRecurInfo();
+          await sleep(1);
+        }
+
+        if (recurArray[j] < recurArray[minIdx]) {
+          minIdx = j;
+        }
+
+        return await findMinIndexRecur(start, j + 1, minIdx);
+      }
+
+      async function insertionSortRecur(i) {
+        const n = recurArray.length;
+        const delay = getDelay();
+        const updateInterval = 10000;
+
+        if (i >= n) {
+          if (enableVisualization) {
+            displayRecurArray(
+              Array.from({ length: Math.min(n, 500) }, (_, idx) => idx),
+              "sorted"
+            );
+          }
+          return;
+        }
+
+        let key = recurArray[i];
+        let j = i - 1;
+
+        if (delay > 0) {
+          displayRecurArray([i], "comparing");
+          await sleep(delay);
+        }
+
+        while (j >= 0 && recurArray[j] > key) {
+          recurCompare++;
+          recurArray[j + 1] = recurArray[j];
+          recurSwap++;
+
+          if (delay > 0) {
+            updateRecurInfo();
+            displayRecurArray([j, j + 1], "swapping");
+            await sleep(delay);
+          } else if (recurSwap % updateInterval === 0) {
+            updateRecurInfo();
+            await sleep(1);
+          }
+          j--;
+        }
+        recurArray[j + 1] = key;
+
+        return await insertionSortRecur(i + 1);
+      }
+
+      async function calculateRecurResults() {
+        const start = performance.now();
+        recurMin = Math.min(...recurArray);
+        const mid = Math.floor(recurArray.length / 2);
+        recurMedian =
+          recurArray.length % 2 === 0
+            ? ((recurArray[mid - 1] + recurArray[mid]) / 2).toFixed(2)
+            : recurArray[mid];
+        const end = performance.now();
+        recurExec = (end - start).toFixed(4);
+
+        document.getElementById("recurMinValue").textContent = recurMin;
+        document.getElementById("recurMedianValue").textContent = recurMedian;
+        document.getElementById("recurExecTime").textContent =
+          recurExec + " ms";
+
+        document.getElementById("recurResults").classList.remove("hidden");
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        document
+          .getElementById("arraySize")
+          .addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+              generateArray();
+            }
+          });
+      });
+    </script>
+  </body>
+</html>
