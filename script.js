@@ -40,9 +40,8 @@ function generateArray() {
   }
 
   // Generate angka random antara 1 sampai size (bisa diganti sesuai kebutuhan)
-  originalArray = Array.from(
-    { length: size },
-    () => Math.floor(Math.random() * size) + 1
+  originalArray = Array.from({ length: size }, () =>
+    Math.floor(Math.random() * size) + 1
   );
 
   iterArray = [...originalArray];
@@ -103,7 +102,7 @@ function displayOriginalArray() {
     moreItem.textContent = `... +${remainingCount}`;
     container.appendChild(moreItem);
   } else {
-    originalArray.forEach((value) => {
+    originalArray.forEach(value => {
       const item = document.createElement("div");
       item.className = "array-item";
       item.textContent = value;
@@ -175,15 +174,52 @@ function displayRecurArray(highlightIndices = [], highlightType = "") {
 }
 
 // =====================================
-// FUNGSI SORTING (dengan animasi yang dioptimalkan)
+// FUNGSI SORTING CORE (tanpa animasi)
 // =====================================
 
-// Insertion Sort Iteratif dengan animasi lancar
-async function insertionSortIter() {
+// Insertion Sort Iteratif Core (hanya sorting, tanpa animasi)
+function insertionSortIterCore(array) {
+  const n = array.length;
+  for (let i = 1; i < n; i++) {
+    let key = array[i];
+    let j = i - 1;
+    while (j >= 0 && array[j] > key) {
+      iterCompare++;
+      array[j + 1] = array[j];
+      iterSwap++;
+      j--;
+    }
+    array[j + 1] = key;
+  }
+}
+
+// Insertion Sort Rekursif Core (hanya sorting, tanpa animasi)
+function insertionSortRecurCore(array, i = 1) {
+  const n = array.length;
+  if (i >= n) return;
+
+  let key = array[i];
+  let j = i - 1;
+  while (j >= 0 && array[j] > key) {
+    recurCompare++;
+    array[j + 1] = array[j];
+    recurSwap++;
+    j--;
+  }
+  array[j + 1] = key;
+
+  insertionSortRecurCore(array, i + 1);
+}
+
+// =====================================
+// FUNGSI ANIMASI (terpisah dari sorting)
+// =====================================
+
+// Animasi untuk Insertion Sort Iteratif
+async function animateInsertionSortIter() {
   const n = iterArray.length;
   const delay = getDelay();
-  const startTime = performance.now();
-  const updateInterval = n > 500 ? 50 : 1; // Update DOM setiap 50 langkah untuk performa
+  const updateInterval = n > 500 ? 50 : 1;
 
   for (let i = 1; i < n; i++) {
     let key = iterArray[i];
@@ -194,8 +230,7 @@ async function insertionSortIter() {
       iterArray[j + 1] = iterArray[j];
       iterSwap++;
 
-      // Animasi hanya jika delay > 0 dan pada interval tertentu
-      if (delay > 0 && (i + j) % updateInterval === 0) {
+      if (delay > 0 && ((i + j) % updateInterval === 0)) {
         updateIterInfo();
         displayIterArray([j, j + 1], "swapping");
         await sleep(delay);
@@ -205,9 +240,6 @@ async function insertionSortIter() {
     iterArray[j + 1] = key;
   }
 
-  iterSortTime = performance.now() - startTime;
-
-  // Tampilkan hasil akhir jika visual aktif
   if (enableVisualization) {
     displayIterArray(
       Array.from({ length: Math.min(n, 500) }, (_, idx) => idx),
@@ -216,9 +248,9 @@ async function insertionSortIter() {
   }
 }
 
-// Insertion Sort Rekursif Versi Stack Manual dengan animasi lancar
-async function insertionSortRecurLarge(array) {
-  const n = array.length;
+// Animasi untuk Insertion Sort Rekursif
+async function animateInsertionSortRecur() {
+  const n = recurArray.length;
   let iStack = [1];
   const delay = getDelay();
   const updateInterval = n > 500 ? 50 : 1;
@@ -227,28 +259,31 @@ async function insertionSortRecurLarge(array) {
     let i = iStack.pop();
     if (i >= n) continue;
 
-    let key = array[i];
+    let key = recurArray[i];
     let j = i - 1;
 
-    while (j >= 0 && array[j] > key) {
+    while (j >= 0 && recurArray[j] > key) {
       recurCompare++;
-      array[j + 1] = array[j];
+      recurArray[j + 1] = recurArray[j];
       recurSwap++;
 
-      // Animasi hanya jika delay > 0 dan pada interval tertentu
-      if (delay > 0 && j % updateInterval === 0) {
+      if (delay > 0 && (j % updateInterval === 0)) {
         updateRecurInfo();
-        displayRecurArray(
-          [j, j + 1].filter((x) => x >= 0 && x < n),
-          "swapping"
-        );
+        displayRecurArray([j, j + 1].filter(x => x >= 0 && x < n), "swapping");
         await sleep(delay);
       }
       j--;
     }
-    array[j + 1] = key;
+    recurArray[j + 1] = key;
 
     iStack.push(i + 1);
+  }
+
+  if (enableVisualization) {
+    displayRecurArray(
+      Array.from({ length: Math.min(n, 500) }, (_, idx) => idx),
+      "sorted"
+    );
   }
 }
 
@@ -258,9 +293,7 @@ async function insertionSortRecurLarge(array) {
 
 async function startIterativeSorting() {
   if (isSorting) {
-    alert(
-      "Sorting sedang berjalan. Tunggu selesai atau klik ulang untuk restart."
-    );
+    alert("Sorting sedang berjalan. Tunggu selesai atau klik ulang untuk restart.");
     return;
   }
   isSorting = true;
@@ -276,10 +309,16 @@ async function startIterativeSorting() {
 
   if (enableVisualization) displayIterArray();
 
-  await insertionSortIter();
+  const startTime = performance.now();
+  if (enableVisualization) {
+    await animateInsertionSortIter();
+  } else {
+    insertionSortIterCore(iterArray);
+  }
+  iterSortTime = performance.now() - startTime;
 
   const n = iterArray.length;
-  const minValue = iterArray[0]; // Sudah terurut in-place
+  const minValue = iterArray[0];
   const medianValue =
     n % 2 === 0
       ? (iterArray[n / 2 - 1] + iterArray[n / 2]) / 2
@@ -288,9 +327,7 @@ async function startIterativeSorting() {
   document.getElementById("iterStatus").textContent = "Selesai";
   document.getElementById("iterMinValue").textContent = minValue;
   document.getElementById("iterMedianValue").textContent = medianValue;
-  document.getElementById("iterExecTime").textContent = `${iterSortTime.toFixed(
-    2
-  )} ms`;
+  document.getElementById("iterExecTime").textContent = `${iterSortTime.toFixed(2)} ms`;
   document.getElementById("iterResults").classList.remove("hidden");
 
   updateIterInfo();
@@ -299,9 +336,7 @@ async function startIterativeSorting() {
 
 async function startRecursiveSorting() {
   if (isSorting) {
-    alert(
-      "Sorting sedang berjalan. Tunggu selesai atau klik ulang untuk restart."
-    );
+    alert("Sorting sedang berjalan. Tunggu selesai atau klik ulang untuk restart.");
     return;
   }
   isSorting = true;
@@ -318,11 +353,15 @@ async function startRecursiveSorting() {
   if (enableVisualization) displayRecurArray();
 
   const startTime = performance.now();
-  await insertionSortRecurLarge(recurArray);
+  if (enableVisualization) {
+    await animateInsertionSortRecur();
+  } else {
+    insertionSortRecurCore(recurArray);
+  }
   recurSortTime = performance.now() - startTime;
 
   const n = recurArray.length;
-  const minValue = recurArray[0]; // Sudah terurut
+  const minValue = recurArray[0];
   const medianValue =
     n % 2 === 0
       ? (recurArray[n / 2 - 1] + recurArray[n / 2]) / 2
@@ -331,18 +370,8 @@ async function startRecursiveSorting() {
   document.getElementById("recurStatus").textContent = "Selesai";
   document.getElementById("recurMinValue").textContent = minValue;
   document.getElementById("recurMedianValue").textContent = medianValue;
-  document.getElementById(
-    "recurExecTime"
-  ).textContent = `${recurSortTime.toFixed(2)} ms`;
+  document.getElementById("recurExecTime").textContent = `${recurSortTime.toFixed(2)} ms`;
   document.getElementById("recurResults").classList.remove("hidden");
-
-  // Tambahkan tampilan sorted hijau untuk rekursif
-  if (enableVisualization) {
-    displayRecurArray(
-      Array.from({ length: Math.min(n, 500) }, (_, idx) => idx),
-      "sorted"
-    );
-  }
 
   updateRecurInfo();
   isSorting = false;
@@ -355,17 +384,13 @@ async function startRecursiveSorting() {
 function updateIterInfo() {
   document.getElementById("iterSwapCount").textContent = iterSwap;
   document.getElementById("iterCompareCount").textContent = iterCompare;
-  document.getElementById("iterSortTime").textContent = `${iterSortTime.toFixed(
-    2
-  )} ms`;
+  document.getElementById("iterSortTime").textContent = `${iterSortTime.toFixed(2)} ms`;
 }
 
 function updateRecurInfo() {
   document.getElementById("recurSwapCount").textContent = recurSwap;
   document.getElementById("recurCompareCount").textContent = recurCompare;
-  document.getElementById(
-    "recurSortTime"
-  ).textContent = `${recurSortTime.toFixed(2)} ms`;
+  document.getElementById("recurSortTime").textContent = `${recurSortTime.toFixed(2)} ms`;
 }
 
 // =====================================
@@ -377,9 +402,7 @@ function showMethod(method) {
   document.getElementById("recursiveViz").classList.remove("active");
   document.getElementById("comparisonViz").classList.remove("active");
 
-  document
-    .querySelectorAll(".method-btn")
-    .forEach((btn) => btn.classList.remove("active"));
+  document.querySelectorAll(".method-btn").forEach(btn => btn.classList.remove("active"));
 
   if (method === "iterative") {
     document.getElementById("iterativeViz").classList.add("active");
@@ -395,41 +418,27 @@ function showComparison() {
   document.getElementById("recursiveViz").classList.remove("active");
   document.getElementById("comparisonViz").classList.add("active");
 
-  document
-    .querySelectorAll(".method-btn")
-    .forEach((btn) => btn.classList.remove("active"));
+  document.querySelectorAll(".method-btn").forEach(btn => btn.classList.remove("active"));
   document.querySelector(".method-btn:nth-child(3)").classList.add("active");
 
   document.getElementById("compIterSwap").textContent = iterSwap || "-";
   document.getElementById("compIterCompare").textContent = iterCompare || "-";
-  document.getElementById("compIterSort").textContent = iterSortTime
-    ? `${iterSortTime.toFixed(2)} ms`
-    : "-";
-  document.getElementById("compIterMin").textContent = iterArray.length
-    ? iterArray[0]
-    : "-";
+  document.getElementById("compIterSort").textContent = iterSortTime ? `${iterSortTime.toFixed(2)} ms` : "-";
+  document.getElementById("compIterMin").textContent = iterArray.length ? iterArray[0] : "-";
   document.getElementById("compIterMedian").textContent = iterArray.length
-    ? iterArray.length % 2 === 0
-      ? (iterArray[iterArray.length / 2 - 1] +
-          iterArray[iterArray.length / 2]) /
-        2
-      : iterArray[Math.floor(iterArray.length / 2)]
+    ? (iterArray.length % 2 === 0
+      ? (iterArray[iterArray.length / 2 - 1] + iterArray[iterArray.length / 2]) / 2
+      : iterArray[Math.floor(iterArray.length / 2)])
     : "-";
 
   document.getElementById("compRecurSwap").textContent = recurSwap || "-";
   document.getElementById("compRecurCompare").textContent = recurCompare || "-";
-  document.getElementById("compRecurSort").textContent = recurSortTime
-    ? `${recurSortTime.toFixed(2)} ms`
-    : "-";
-  document.getElementById("compRecurMin").textContent = recurArray.length
-    ? recurArray[0]
-    : "-";
+  document.getElementById("compRecurSort").textContent = recurSortTime ? `${recurSortTime.toFixed(2)} ms` : "-";
+  document.getElementById("compRecurMin").textContent = recurArray.length ? recurArray[0] : "-";
   document.getElementById("compRecurMedian").textContent = recurArray.length
-    ? recurArray.length % 2 === 0
-      ? (recurArray[recurArray.length / 2 - 1] +
-          recurArray[recurArray.length / 2]) /
-        2
-      : recurArray[Math.floor(recurArray.length / 2)]
+    ? (recurArray.length % 2 === 0
+      ? (recurArray[recurArray.length / 2 - 1] + recurArray[recurArray.length / 2]) / 2
+      : recurArray[Math.floor(recurArray.length / 2)])
     : "-";
 
   document.getElementById("comparisonSection").classList.remove("hidden");
@@ -440,25 +449,18 @@ function showComparison() {
 // =====================================
 
 function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function getDelay() {
   const speed = document.getElementById("sortSpeed").value;
   switch (speed) {
-    case "1":
-      return 1000;
-    case "2":
-      return 500;
-    case "3":
-      return 200;
-    case "4":
-      return 100;
-    case "5":
-      return 50;
-    case "6":
-      return 0;
-    default:
-      return 200;
+    case "1": return 1000;
+    case "2": return 500;
+    case "3": return 200;
+    case "4": return 100;
+    case "5": return 50;
+    case "6": return 0;
+    default: return 200;
   }
 }
