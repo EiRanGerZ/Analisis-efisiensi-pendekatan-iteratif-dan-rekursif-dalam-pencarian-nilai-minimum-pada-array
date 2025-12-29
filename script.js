@@ -363,41 +363,34 @@
         async function selectionSortIter() {
             const n = iterArray.length;
             const delay = getDelay();
-            const updateInterval = 10000; // Update UI setiap 10000 iterasi untuk mode instan
+            const updateInterval = 10000; 
             
-            // Loop untuk setiap posisi array
             for (let i = 0; i < n - 1; i++) {
-                let minIdx = i; // Anggap elemen i adalah yang terkecil
-                
+                let minIdx = i; 
                 // Cari elemen terkecil di sisa array
                 for (let j = i + 1; j < n; j++) {
-                    iterCompare++; // Increment counter perbandingan
-                    
+                    iterCompare++;
                     // Update UI jika ada delay atau setiap interval tertentu
                     if (delay > 0) {
                         updateIterInfo();
-                        displayIterArray([minIdx, j], 'comparing'); // Highlight elemen yang dibandingkan
+                        displayIterArray([minIdx, j], 'comparing');
                         await sleep(delay);
                     } else if (iterCompare % updateInterval === 0) {
                         updateIterInfo();
-                        await sleep(1); // Yield ke event loop agar UI tidak freeze
+                        await sleep(1); 
                     }
-                    
-                    // Update minIdx jika menemukan elemen yang lebih kecil
                     if (iterArray[j] < iterArray[minIdx]) {
                         minIdx = j;
                     }
                 }
-                
-                // Tukar elemen terkecil dengan elemen posisi i
+
                 if (minIdx !== i) {
                     [iterArray[i], iterArray[minIdx]] = [iterArray[minIdx], iterArray[i]];
-                    iterSwap++; // Increment counter swap
+                    iterSwap++;
                     
-                    // Update UI dengan animasi swap
                     if (delay > 0) {
                         updateIterInfo();
-                        displayIterArray([i, minIdx], 'swapping'); // Highlight elemen yang di-swap
+                        displayIterArray([i, minIdx], 'swapping'); 
                         await sleep(delay);
                     } else if (iterSwap % (updateInterval / 10) === 0) {
                         updateIterInfo();
@@ -426,24 +419,20 @@
             const delay = getDelay();
             const updateInterval = 10000;
             
-            // Mulai dari elemen kedua (index 1)
             for (let i = 1; i < n; i++) {
-                let key = iterArray[i]; // Simpan elemen yang akan disisipkan
+                let key = iterArray[i]; 
                 let j = i - 1;
                 
-                // Tampilkan elemen yang sedang diproses
                 if (delay > 0) {
                     displayIterArray([i], 'comparing');
                     await sleep(delay);
                 }
                 
-                // Geser elemen yang lebih besar dari key ke kanan
                 while (j >= 0 && iterArray[j] > key) {
-                    iterCompare++; // Increment counter perbandingan
-                    iterArray[j + 1] = iterArray[j]; // Geser elemen ke kanan
-                    iterSwap++; // Increment counter swap
-                    
-                    // Update UI dengan animasi
+                    iterCompare++; 
+                    iterArray[j + 1] = iterArray[j]; 
+                    iterSwap++;
+                  
                     if (delay > 0) {
                         updateIterInfo();
                         displayIterArray([j, j + 1], 'swapping');
@@ -454,7 +443,6 @@
                     }
                     j--;
                 }
-                // Sisipkan key di posisi yang benar
                 iterArray[j + 1] = key;
             }
             
@@ -567,7 +555,6 @@
             const delay = getDelay();
             const updateInterval = 10000;
             
-            // Base case: jika sudah sampai akhir array
             if (i >= n - 1) {
                 if (enableVisualization) {
                     displayRecurArray(Array.from({length: Math.min(n, 500)}, (_, idx) => idx), 'sorted');
@@ -575,15 +562,12 @@
                 return;
             }
             
-            // Cari index minimum di sisa array (rekursif)
             let minIdx = await findMinIndexRecur(i, i + 1, i);
             
-            // Tukar jika perlu
             if (minIdx !== i) {
                 [recurArray[i], recurArray[minIdx]] = [recurArray[minIdx], recurArray[i]];
                 recurSwap++;
                 
-                // Update UI dengan animasi
                 if (delay > 0) {
                     updateRecurInfo();
                     displayRecurArray([i, minIdx], 'swapping');
@@ -594,7 +578,6 @@
                 }
             }
             
-            // Recursive call: lanjut ke elemen berikutnya
             return await selectionSortRecur(i + 1);
         }
 
@@ -647,7 +630,6 @@
             const delay = getDelay();
             const updateInterval = 10000;
             
-            // Base case: sudah sampai akhir array
             if (i >= n) {
                 if (enableVisualization) {
                     displayRecurArray(Array.from({length: Math.min(n, 500)}, (_, idx) => idx), 'sorted');
@@ -655,22 +637,19 @@
                 return;
             }
             
-            let key = recurArray[i]; // Simpan elemen yang akan disisipkan
+            let key = recurArray[i];
             let j = i - 1;
             
-            // Tampilkan elemen yang sedang diproses
             if (delay > 0) {
                 displayRecurArray([i], 'comparing');
                 await sleep(delay);
             }
             
-            // Geser elemen yang lebih besar dari key ke kanan
             while (j >= 0 && recurArray[j] > key) {
                 recurCompare++;
                 recurArray[j + 1] = recurArray[j];
                 recurSwap++;
                 
-                // Update UI dengan animasi
                 if (delay > 0) {
                     updateRecurInfo();
                     displayRecurArray([j, j + 1], 'swapping');
@@ -681,10 +660,8 @@
                 }
                 j--;
             }
-            // Sisipkan key di posisi yang benar
             recurArray[j + 1] = key;
             
-            // Recursive call: lanjut ke elemen berikutnya
             return await insertionSortRecur(i + 1);
         }
 
