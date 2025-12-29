@@ -6,11 +6,17 @@
     <title>Pencarian Min & Median - Iteratif vs Rekursif</title>
     <link rel="stylesheet" href="style.css">
   </head>
+
   <body>
     <div class="container">
-      <h1>🔍 Pencarian Nilai Minimum & Median</h1>
 
+      <h1>🔍 Pencarian Nilai Minimum & Median</h1>
+      <!-- ===================== -->
+      <!-- Bagian Input Pengguna -->
+      <!-- ===================== -->
       <div class="input-section">
+
+        <!-- Input jumlah elemen array -->
         <label for="arraySize">Jumlah Elemen Array:</label>
         <div class="input-group">
           <input
@@ -20,9 +26,11 @@
             value="10"
             placeholder="Masukkan jumlah elemen"
           />
+          <!-- Tombol untuk generate array secara acak -->
           <button onclick="generateArray()">Generate Array</button>
         </div>
 
+        <!-- Pilihan metode sorting -->
         <label for="sortMethod" style="margin-top: 15px">Metode Sorting:</label>
         <div class="input-group">
           <select id="sortMethod">
@@ -31,9 +39,10 @@
           </select>
         </div>
 
-        <label for="sortSpeed" style="margin-top: 15px"
-          >Kecepatan Animasi:</label
-        >
+        <!-- Pilihan kecepatan animasi sorting -->
+        <label for="sortSpeed" style="margin-top: 15px">
+          Kecepatan Animasi:
+        </label>
         <div class="input-group">
           <select id="sortSpeed">
             <option value="1">Sangat Lambat (1000ms)</option>
@@ -45,6 +54,7 @@
           </select>
         </div>
 
+        <!-- Catatan informasi tambahan untuk pengguna -->
         <div class="info-note">
           💡 <strong>Tips:</strong> Untuk array > 1000 elemen, gunakan mode
           "Instan" untuk hasil cepat. Visualisasi akan dinonaktifkan otomatis
@@ -52,6 +62,9 @@
         </div>
       </div>
 
+      <!-- ================================= -->
+      <!-- Tampilan Array Awal (Original)   -->
+      <!-- ================================= -->
       <div id="originalArray" class="array-display hidden">
         <div class="array-label">
           Array Original (<span id="arrayCount">0</span> elemen):
@@ -59,6 +72,9 @@
         <div id="originalValues" class="array-values"></div>
       </div>
 
+      <!-- ================================= -->
+      <!-- Selector Metode (Iteratif/Rekursif/Perbandingan) -->
+      <!-- ================================= -->
       <div class="method-selector hidden" id="methodSelector">
         <button class="method-btn active" onclick="showMethod('iterative')">
           ITERATIF
@@ -71,12 +87,18 @@
         </button>
       </div>
 
-      <!-- Visualisasi Iteratif -->
+      <!-- =============================== -->
+      <!-- Visualisasi Metode Iteratif     -->
+      <!-- =============================== -->
       <div id="iterativeViz" class="visualization-container active">
+
+        <!-- Informasi proses sorting iteratif -->
         <div class="sorting-info hidden" id="iterInfo">
           <div class="info-header">
             📊 ITERATIF - <span id="iterMethodName">-</span>
           </div>
+
+          <!-- Statistik proses sorting -->
           <div class="info-grid">
             <div class="info-item">
               <div class="info-label">Status</div>
@@ -97,11 +119,13 @@
           </div>
         </div>
 
+        <!-- Visualisasi array yang sedang diproses (iteratif) -->
         <div class="array-display hidden" id="iterArrayDisplay">
           <div class="array-label">Array Iteratif (Sedang Diproses):</div>
           <div id="iterArrayValues" class="array-values"></div>
         </div>
 
+        <!-- Hasil akhir metode iteratif -->
         <div class="results hidden" id="iterResults">
           <div class="results-title">🎯 HASIL ITERATIF</div>
           <div class="results-grid">
@@ -120,6 +144,7 @@
           </div>
         </div>
 
+        <!-- Tombol untuk memulai proses iteratif -->
         <div style="text-align: center; margin-top: 20px">
           <button
             onclick="startIterativeSorting()"
@@ -132,12 +157,18 @@
         </div>
       </div>
 
-      <!-- Visualisasi Rekursif -->
+      <!-- =============================== -->
+      <!-- Visualisasi Metode Rekursif     -->
+      <!-- =============================== -->
       <div id="recursiveViz" class="visualization-container">
+
+        <!-- Informasi proses sorting rekursif -->
         <div class="sorting-info hidden" id="recurInfo">
           <div class="info-header">
             🔄 REKURSIF - <span id="recurMethodName">-</span>
           </div>
+
+          <!-- Statistik proses sorting -->
           <div class="info-grid">
             <div class="info-item">
               <div class="info-label">Status</div>
@@ -158,11 +189,13 @@
           </div>
         </div>
 
+        <!-- Visualisasi array rekursif -->
         <div class="array-display hidden" id="recurArrayDisplay">
           <div class="array-label">Array Rekursif (Sedang Diproses):</div>
           <div id="recurArrayValues" class="array-values"></div>
         </div>
 
+        <!-- Hasil akhir metode rekursif -->
         <div class="results hidden" id="recurResults">
           <div class="results-title">🎯 HASIL REKURSIF</div>
           <div class="results-grid">
@@ -181,6 +214,7 @@
           </div>
         </div>
 
+        <!-- Tombol untuk memulai proses rekursif -->
         <div style="text-align: center; margin-top: 20px">
           <button
             onclick="startRecursiveSorting()"
@@ -193,74 +227,45 @@
         </div>
       </div>
 
-      <!-- Comparison Section -->
+      <!-- =============================== -->
+      <!-- Bagian Perbandingan Hasil       -->
+      <!-- =============================== -->
       <div id="comparisonViz" class="visualization-container">
         <div class="comparison-section hidden" id="comparisonSection">
+
+          <!-- Judul perbandingan -->
           <div class="comparison-title">📊 PERBANDINGAN HASIL</div>
+
+          <!-- Grid perbandingan iteratif dan rekursif -->
           <div class="comparison-grid">
+            <!-- Iteratif -->
             <div class="comparison-card">
               <div class="comparison-method">🔵 ITERATIF</div>
               <div class="comparison-stats">
-                <div class="stat-row">
-                  <span class="stat-label">Swap:</span>
-                  <span class="stat-value" id="compIterSwap">-</span>
-                </div>
-                <div class="stat-row">
-                  <span class="stat-label">Perbandingan:</span>
-                  <span class="stat-value" id="compIterCompare">-</span>
-                </div>
-                <div class="stat-row">
-                  <span class="stat-label">Waktu Sorting:</span>
-                  <span class="stat-value" id="compIterSort">-</span>
-                </div>
-                <div class="stat-row">
-                  <span class="stat-label">Minimum:</span>
-                  <span class="stat-value" id="compIterMin">-</span>
-                </div>
-                <div class="stat-row">
-                  <span class="stat-label">Median:</span>
-                  <span class="stat-value" id="compIterMedian">-</span>
-                </div>
+                <div class="stat-row"><span class="stat-label">Swap:</span><span class="stat-value" id="compIterSwap">-</span></div>
+                <div class="stat-row"><span class="stat-label">Perbandingan:</span><span class="stat-value" id="compIterCompare">-</span></div>
+                <div class="stat-row"><span class="stat-label">Waktu Sorting:</span><span class="stat-value" id="compIterSort">-</span></div>
+                <div class="stat-row"><span class="stat-label">Minimum:</span><span class="stat-value" id="compIterMin">-</span></div>
+                <div class="stat-row"><span class="stat-label">Median:</span><span class="stat-value" id="compIterMedian">-</span></div>
               </div>
             </div>
 
+            <!-- Rekursif -->
             <div class="comparison-card">
               <div class="comparison-method">🔴 REKURSIF</div>
               <div class="comparison-stats">
-                <div class="stat-row">
-                  <span class="stat-label">Swap:</span>
-                  <span class="stat-value" id="compRecurSwap">-</span>
-                </div>
-                <div class="stat-row">
-                  <span class="stat-label">Perbandingan:</span>
-                  <span class="stat-value" id="compRecurCompare">-</span>
-                </div>
-                <div class="stat-row">
-                  <span class="stat-label">Waktu Sorting:</span>
-                  <span class="stat-value" id="compRecurSort">-</span>
-                </div>
-                <div class="stat-row">
-                  <span class="stat-label">Minimum:</span>
-                  <span class="stat-value" id="compRecurMin">-</span>
-                </div>
-                <div class="stat-row">
-                  <span class="stat-label">Median:</span>
-                  <span class="stat-value" id="compRecurMedian">-</span>
-                </div>
+                <div class="stat-row"><span class="stat-label">Swap:</span><span class="stat-value" id="compRecurSwap">-</span></div>
+                <div class="stat-row"><span class="stat-label">Perbandingan:</span><span class="stat-value" id="compRecurCompare">-</span></div>
+                <div class="stat-row"><span class="stat-label">Waktu Sorting:</span><span class="stat-value" id="compRecurSort">-</span></div>
+                <div class="stat-row"><span class="stat-label">Minimum:</span><span class="stat-value" id="compRecurMin">-</span></div>
+                <div class="stat-row"><span class="stat-label">Median:</span><span class="stat-value" id="compRecurMedian">-</span></div>
               </div>
             </div>
           </div>
 
-          <div
-            style="
-              text-align: center;
-              margin-top: 20px;
-              padding: 15px;
-              background: white;
-              border-radius: 6px;
-            "
-          >
-            <p style="font-size: 14px; color: #666; margin-bottom: 10px">
+          <!-- Catatan informasi -->
+          <div style="text-align: center; margin-top: 20px; padding: 15px; background: white; border-radius: 6px;">
+            <p style="font-size: 14px; color: #666;">
               💡 Jalankan kedua metode untuk melihat perbandingan lengkap
             </p>
           </div>
@@ -268,8 +273,6 @@
       </div>
     </div>
 
-    <script src="script.js">
-      
-    </script>
+    <script src="script.js"></script>
   </body>
 </html>
