@@ -5,7 +5,7 @@ let originalArray = [];
 let iterArray = [];
 let recurArray = [];
 let enableVisualization = true;
-let isSorting = false; // Flag untuk mencegah multiple start
+let isSorting = false;
 
 // Variabel untuk tracking statistik iteratif
 let iterSwap = 0;
@@ -39,7 +39,7 @@ function generateArray() {
     }
   }
 
-  // Generate angka random antara 1 sampai size (bisa diganti sesuai kebutuhan)
+  // Generate angka random antara 1 sampai size
   originalArray = Array.from({ length: size }, () =>
     Math.floor(Math.random() * size) + 1
   );
@@ -79,7 +79,7 @@ function hideResults() {
 }
 
 // =====================================
-// FUNGSI TAMPILAN ARRAY (batasi render max 100 elemen untuk performa UI)
+// FUNGSI TAMPILAN ARRAY (batasi render max 100 elemen)
 // =====================================
 
 function displayOriginalArray() {
@@ -174,10 +174,10 @@ function displayRecurArray(highlightIndices = [], highlightType = "") {
 }
 
 // =====================================
-// FUNGSI SORTING CORE (tanpa animasi)
+// FUNGSI SORTING CORE
 // =====================================
 
-// Insertion Sort Iteratif Core (hanya sorting, tanpa animasi)
+// Insertion Sort Iteratif 
 function insertionSortIterCore(array) {
   const n = array.length;
   for (let i = 1; i < n; i++) {
@@ -193,7 +193,7 @@ function insertionSortIterCore(array) {
   }
 }
 
-// Insertion Sort Rekursif Core (hanya sorting, tanpa animasi)
+// Insertion Sort Rekursif
 function insertionSortRecurCore(array, i = 1) {
   const n = array.length;
   if (i >= n) return;
